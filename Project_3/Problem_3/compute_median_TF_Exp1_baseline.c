@@ -96,7 +96,40 @@ struct Genes read_genes(FILE* inputFile) {
 */
 void process_tetranucs(struct Genes genes, int* gene_TF, int gene_index) {
 
-    // TODO: process the current gene array (Copy from problem 2)
+    // Scope idx outside hte loop so we can reuse its val instead of looking at every char 4 times
+    // So, after this first pass we only have to look ahead 1 instead of going through all 4 every time
+
+    int idx = 0;
+    for (int c = 3; c > -1; c--) {   // c-- is to c++ what Shadow is to Sonic
+        
+        char curr = genes.gene_sequences[gene_index * GENE_SIZE + c]; //get the character-value
+
+        // letter from the substring-window
+        // Increments idx according to position of char in quaternary bitstring (quatstring??)
+        switch (curr) {
+            case 'A': idx += 0 * pow(4, c); break;
+            case 'C': idx += 1 * pow(4, c); break;
+            case 'G': idx += 2 * pow(4, c); break;
+            case 'T': idx += 3 * pow(4, c); break;
+        }
+    }
+    gene_TF[idx] += 1;
+
+    // TODO: process the [rest of the] current gene array
+    for (int i = 4; i < genes.gene_sizes[gene_index] - 3; i++) {
+        
+        idx = idx * 4 % 256;    // Shift out the leftmost digit in quaternary 
+        char curr = genes.gene_sequences[gene_index * GENE_SIZE + i]; //get the character-value
+
+        switch (curr) {
+            case 'A': idx += 0; break;
+            case 'C': idx += 1; break;
+            case 'G': idx += 2; break;
+            case 'T': idx += 3; break;
+        }
+
+        gene_TF[idx] += 1;
+    }
 
 } // End Process Tetranucs //
 
@@ -167,8 +200,8 @@ int main(int argc, char* argv[]) {
     double start = omp_get_wtime();
     /*  1) Tetranuc computation
             For each gene in the list:
-                Compute this gene’s TF
-                Add this gene’s TF to the running total TF
+                Compute this geneï¿½s TF
+                Add this geneï¿½s TF to the running total TF
 
     */ // TODO: parallelize the computations for each gene for exp 1 and exp 2.
     for (int gene_index = 0; gene_index < genes.num_genes; ++gene_index) {
