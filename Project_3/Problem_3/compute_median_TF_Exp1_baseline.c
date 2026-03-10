@@ -100,23 +100,23 @@ void process_tetranucs(struct Genes genes, int* gene_TF, int gene_index) {
     // So, after this first pass we only have to look ahead 1 instead of going through all 4 every time
 
     int idx = 0;
-    for (int c = 3; c > -1; c--) {   // c-- is to c++ what Shadow is to Sonic
+    for (int c = 0; c < 4; c++) {   // omg c++ mention
         
         char curr = genes.gene_sequences[gene_index * GENE_SIZE + c]; //get the character-value
 
         // letter from the substring-window
         // Increments idx according to position of char in quaternary bitstring (quatstring??)
         switch (curr) {
-            case 'A': idx += 0 * pow(4, c); break;
-            case 'C': idx += 1 * pow(4, c); break;
-            case 'G': idx += 2 * pow(4, c); break;
-            case 'T': idx += 3 * pow(4, c); break;
+            case 'A': idx += 0 * pow(4, 3 - c); break;
+            case 'C': idx += 1 * pow(4, 3 - c); break;
+            case 'G': idx += 2 * pow(4, 3 - c); break;
+            case 'T': idx += 3 * pow(4, 3 - c); break;
         }
     }
     gene_TF[idx] += 1;
 
     // TODO: process the [rest of the] current gene array
-    for (int i = 4; i < genes.gene_sizes[gene_index] - 3; i++) {
+    for (int i = 4; i < genes.gene_sizes[gene_index]; i++) {
         
         idx = idx * 4 % 256;    // Shift out the leftmost digit in quaternary 
         char curr = genes.gene_sequences[gene_index * GENE_SIZE + i]; //get the character-value
@@ -136,18 +136,35 @@ void process_tetranucs(struct Genes genes, int* gene_TF, int gene_index) {
 
 // Find Median ------------------------ //
 /* Find the median of an unsorted array */
+
+// Comparison param for quicksort
+int compare_int(const void *a,const void *b) {
+    
+    // Source - https://stackoverflow.com/a/1791064
+    // Posted by whacko__Cracko, modified by community. See post 'Timeline' for change history
+    // Retrieved 2026-03-08, License - CC BY-SA 2.5
+    
+    int *x = (int *) a;
+    int *y = (int *) b;
+    return *x - *y;
+}
+
 double find_median(int* freqs, int num_genes) {
 
     // TODO: sort the frequencies
+    qsort(freqs, num_genes, sizeof(*freqs), compare_int);
 
     // TODO: median if even
-    if (num_genes % 2 == 0)
-        return 2;
-
+    if (num_genes % 2 == 0) {
+        int f1 = freqs[(int) num_genes / 2 - 1];
+        int f2 = freqs[(int) num_genes / 2];
+        return (f1 + f2) / 2.0;
+    }
+    
     // TODO median if odd
-    else
-        return 1;
-
+    else {
+        return (float) freqs[(int) (num_genes / 2)];
+    }
 } // End Find Median //
 
 
@@ -156,7 +173,7 @@ double find_median(int* freqs, int num_genes) {
 //      Processes the tetranucleotides.
 int main(int argc, char* argv[]) {
     // Check for console errors
-    if (argc != 4) {
+    if (argc != 5) {
         printf("USE LIKE THIS:\ncompute_average_TF_Exp1 input.fna average_TF.csv time.csv\n");
         exit(-1);
     }
@@ -185,6 +202,10 @@ int main(int argc, char* argv[]) {
         exit(-4);
     }
 
+    // Get the thread count
+    char *p;
+    int numThreads = strtol(argv[4], &p, 10);
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
     // Below is a data structure to help you access the gene-file's data:
@@ -204,6 +225,7 @@ int main(int argc, char* argv[]) {
                 Add this gene�s TF to the running total TF
 
     */ // TODO: parallelize the computations for each gene for exp 1 and exp 2.
+#pragma omp parallel for num_threads(numThreads) default(none) shared(genes, gene_TF_counts)
     for (int gene_index = 0; gene_index < genes.num_genes; ++gene_index) {
 
         // Compute this gene's TF

@@ -100,23 +100,23 @@ void process_tetranucs(struct Genes genes, int* gene_TF, int gene_index) {
     // So, after this first pass we only have to look ahead 1 instead of going through all 4 every time
 
     int idx = 0;
-    for (int c = 3; c > -1; c--) {   // c-- is to c++ what Shadow is to Sonic
+    for (int c = 0; c < 4; c++) {   // omg c++ mention
         
         char curr = genes.gene_sequences[gene_index * GENE_SIZE + c]; //get the character-value
 
         // letter from the substring-window
         // Increments idx according to position of char in quaternary bitstring (quatstring??)
         switch (curr) {
-            case 'A': idx += 0 * pow(4, c); break;
-            case 'C': idx += 1 * pow(4, c); break;
-            case 'G': idx += 2 * pow(4, c); break;
-            case 'T': idx += 3 * pow(4, c); break;
+            case 'A': idx += 0 * pow(4, 3 - c); break;
+            case 'C': idx += 1 * pow(4, 3 - c); break;
+            case 'G': idx += 2 * pow(4, 3 - c); break;
+            case 'T': idx += 3 * pow(4, 3 - c); break;
         }
     }
     gene_TF[idx] += 1;
 
     // TODO: process the [rest of the] current gene array
-    for (int i = 4; i < genes.gene_sizes[gene_index] - 3; i++) {
+    for (int i = 4; i < genes.gene_sizes[gene_index]; i++) {
         
         idx = idx * 4 % 256;    // Shift out the leftmost digit in quaternary 
         char curr = genes.gene_sequences[gene_index * GENE_SIZE + i]; //get the character-value
@@ -168,6 +168,10 @@ int main(int argc, char* argv[]) {
         exit(-4);
     }
 
+    // Get the thread count
+    char *p;
+    int numThreads = strtol(argv[4], &p, 10);
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
 
@@ -190,7 +194,7 @@ int main(int argc, char* argv[]) {
     */ 
 
     // TODO: parallelize the computations for each gene.
-#pragma omp parallel for num_threads(8) default(none) shared(genes, TF) schedule(static)
+#pragma omp parallel for num_threads(numThreads) default(none) shared(genes, TF) schedule(guided)
     for (int gene_index = 0; gene_index < genes.num_genes; ++gene_index) {
 
         // Compute this gene's TF
@@ -198,11 +202,11 @@ int main(int argc, char* argv[]) {
         process_tetranucs(genes, gene_TF, gene_index);
 
         // Add this gene's TF to the running total TF
-        for (int t = 0; t < NUM_TETRANUCS; ++t) {
-#pragma omp atomic
+#pragma omp critical
+{
+        for (int t = 0; t < NUM_TETRANUCS; ++t)
             TF[t] += gene_TF[t];
-        }
-
+}
         free(gene_TF);
     }
 

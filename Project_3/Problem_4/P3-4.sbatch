@@ -14,14 +14,14 @@
 #
 # --------------------- Change the items below here! ---------------------
 #
-#SBATCH --mail-user=yourEmailHere@ou.edu
+#SBATCH --mail-user=hunter.d.merrill-1@ou.edu
 #SBATCH --mail-type=ALL
 #
-#SBATCH --chdir=/home/oucspdnxxx/ ... /Project_3/Problem_4
-#SBATCH --output=/home/oucspdnxxx/ ... /Project_3/Problem_4/_P3-4_%J_stdout.txt
-#SBATCH --error=/home/oucspdnxxx/ ... /Project_3/Problem_4/_P3-4_%J_stderr.txt
+#SBATCH --chdir=/home/oucspdn094/Project_3_Tests/Merrill_Hunter_Project_3/Problem_4
+#SBATCH --output=/home/oucspdn094/Project_3_Tests/Merrill_Hunter_Project_3/Problem_4/_P3-4_%J_stdout.txt
+#SBATCH --error=/home/oucspdn094/Project_3_Tests/Merrill_Hunter_Project_3/Problem_4/_P3-4_%J_stderr.txt
 
 #################################################
 
-# make run <-- You can run commands from your makefile if you so wish.
-./kmeans_parallel_starter 1000000 points_1M.csv 16 initial_centroids.csv output.csv time.csv 1
+make run #<-- You can run commands from your makefile if you so wish.
+#./kmeans_parallel_starter 1000000 points_1M.csv 16 initial_centroids.csv output.csv time.csv 1

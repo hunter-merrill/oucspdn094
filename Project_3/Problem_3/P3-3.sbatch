@@ -14,12 +14,12 @@
 #
 # --------------------- Change the items below here! ---------------------
 #
-#SBATCH --mail-user=yourEmailHere@ou.edu
+#SBATCH --mail-user=hunter.d.merrill-1@ou.edu
 #SBATCH --mail-type=ALL
 #
-#SBATCH --chdir=/home/oucspdnxxx/ ... /Project_3/Problem_3
-#SBATCH --output=/home/oucspdnxxx/ ... /Project_3/Problem_3/_P3-3_%J_stdout.txt
-#SBATCH --error=/home/oucspdnxxx/ ... /Project_3/Problem_3/_P3-3_%J_stderr.txt
+#SBATCH --chdir=/home/oucspdn094/Project_3_Tests/Merrill_Hunter_Project_3/Problem_3
+#SBATCH --output=/home/oucspdn094/Project_3_Tests/Merrill_Hunter_Project_3/Problem_3/_P3-3_%J_stdout.txt
+#SBATCH --error=/home/oucspdn094/Project_3_Tests/Merrill_Hunter_Project_3/Problem_3/_P3-3_%J_stderr.txt
 
 #################################################
 
@@ -27,5 +27,5 @@
 # Please use another node and change the time if you wish to test
 #	multiple runs of your code!
 
-# make run <-- You can run commands from your makefile if you so wish.
-./compute_median_TF_Exp1_starter in.fna OUTPUT_starter_1th.csv TIME_starter_1th.csv 1
+make run #<-- You can run commands from your makefile if you so wish.
+#./compute_median_TF_Exp1_starter GRCh38_50_rna.fna OUTPUT_starter_1th.csv TIME_starter_1th.csv 1
